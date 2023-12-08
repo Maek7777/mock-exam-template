@@ -33,13 +33,9 @@ model.medium = medium
 
 # Put your intermediate solution steps here if you have any ...
 
-with model:
-    model.objective = model.reactions.EX_ac_e
-    solution = model.optimize()
-
 # Replace _ with you're final calculation step or a variable that contains the final solution.
 # maximum_acetate_yield_mol needs to resolve to a positive floating point number
-maximum_acetate_yield_mol = solution.fluxes['EX_ac_e'] / (-1. * solution.fluxes['EX_glc__D_e'])
+maximum_acetate_yield_mol = _
 
 
 # 2. Based on the model, what is the theoretical maximum yield of acetate in units of
@@ -52,7 +48,7 @@ maximum_acetate_yield_mol = solution.fluxes['EX_ac_e'] / (-1. * solution.fluxes[
 
 # Replace _ with you're final calculation step or a variable that contains the final solution.
 # maximum_acetate_yield_cmol needs to resolve to a positive floating point number
-maximum_acetate_yield_cmol = (solution.fluxes['EX_ac_e'] * model.metabolites.ac_c.elements['C']) / (-1. * solution.fluxes['EX_glc__D_e'] * model.metabolites.glc__D_e.elements['C'])
+maximum_acetate_yield_cmol = _
 
 
 # 3. Based on the model's stoichiometry alone, how many reaction fluxes need to be measured
@@ -64,15 +60,14 @@ maximum_acetate_yield_cmol = (solution.fluxes['EX_ac_e'] * model.metabolites.ac_
 
 # Put your intermediate solution steps here if you have any ...
 
-S = create_stoichiometric_matrix(model)
 
 # Replace _ with you're final calculation step or a variable that contains the final solution.
-# degrees_of_freedom needs to be a list of reaction IDs from the model (each of type str)
+# degrees_of_freedom needs to be an integer number.
 
-degrees_of_freedom = S.shape[1] - np.linalg.matrix_rank(S)
+degrees_of_freedom = _
 
 
-# 4. How much is the (optimal) growth rate reduced if fumerase (FUM in the model) is
+# 4. How much is the (optimal) growth rate reduced if fumarase (FUM in the model) is
 #    overexpressed to have a 2-fold higher flux in comparison to its flux at maximum growth rate?
 
 # Hints:
@@ -81,19 +76,12 @@ degrees_of_freedom = S.shape[1] - np.linalg.matrix_rank(S)
 
 # Put your intermediate solution steps here if you have any ...
 
-solution = model.optimize()
-fum_flux = solution.fluxes['FUM']
-growth = solution.objective_value
-with model:
-    model.reactions.FUM.lower_bound = fum_flux * 2
-    solution_overexpression = model.optimize()
-    growth_overexpression = solution_overexpression.objective_value
 
 # Replace _ with you're final calculation step or a variable that contains the final solution.
 # growth_reduction needs to be a floating point number that corresponds to
 # optimal_growth - growth_fum_overexpression
 
-growth_reduction = growth - growth_overexpression
+growth_reduction = _
 
 
 # 5. What genes are essential under acetate conditions but not glucose conditions?
@@ -112,32 +100,10 @@ growth_reduction = growth - growth_overexpression
 
 # Put your intermediate solution steps here if you have any ...
 
-essential_genes_glucose = []
-for gene in model.genes:
-    with model:
-        gene.knock_out()
-        mutant_growth = model.slim_optimize(error_value=0.)
-        if mutant_growth < 0.05:
-            essential_genes_glucose.append(gene.id)
-essential_genes_glucose = set(essential_genes_glucose)
-
-with model:
-    acetate_medium = model.medium
-    acetate_medium['EX_glc__D_e'] = 0
-    acetate_medium['EX_ac_e'] = 10
-    model.medium = acetate_medium
-    essential_genes_acetate = []
-    for gene in model.genes:
-        with model:
-            gene.knock_out()
-            mutant_growth = model.slim_optimize(error_value=0.)
-            if mutant_growth < 0.05:
-                essential_genes_acetate.append(gene.id)
-essential_genes_acetate = set(essential_genes_acetate)
     
 # Replace _ with you're final calculation step or a variable that contains the final solution.
 # essential_only_in_acetate needs to resolve to a set of gene IDs of type str ({'b2286', 'b2287', ...})
-essential_only_in_acetate = essential_genes_acetate.difference(essential_genes_glucose)
+essential_only_in_acetate = _
 
 
 #### Tests are happening in the end now ...
